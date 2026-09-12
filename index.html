@@ -30,9 +30,18 @@ body{background:var(--bg);color:var(--ink);font-family:var(--mono);overflow:hidd
 button{font-family:var(--mono);}
 
 .veil{position:fixed;inset:0;display:flex;align-items:flex-start;justify-content:center;
-  background:rgba(8,7,4,.9);z-index:40;padding:18px;overflow-y:auto;}
+  background:rgba(8,7,4,.9);z-index:40;padding:18px;overflow-y:auto;
+  animation:veilIn .16s ease both;}
 .card{max-width:700px;width:100%;border:1px solid var(--rule);background:var(--panel);
-  padding:26px clamp(16px,4vw,32px);margin-block:auto;}
+  padding:26px clamp(16px,4vw,32px);margin-block:auto;
+  animation:cardIn .26s cubic-bezier(.2,.85,.3,1) both;}
+@keyframes veilIn{from{opacity:0;}to{opacity:1;}}
+@keyframes cardIn{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:none;}}
+@keyframes cardPop{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:none;}}
+@media(prefers-reduced-motion:reduce){
+  .veil,.card,.cards .ucard{animation:none;}
+  .ucard:hover,.chip:hover{transform:none;}
+}
 .card h1{font-family:var(--disp);font-weight:700;font-size:clamp(42px,10vw,78px);line-height:.88;
   margin:0 0 6px;text-transform:uppercase;}
 .card .sub{color:var(--muted);font-size:12px;letter-spacing:.14em;text-transform:uppercase;margin:0 0 20px;}
@@ -59,34 +68,50 @@ button{font-family:var(--mono);}
 .pick i{font-style:normal;display:block;font-size:10px;letter-spacing:.1em;margin-top:6px;text-transform:uppercase;}
 
 /* workshop */
-#shop{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--panel);
-  border-top:1px solid var(--rule);display:grid;grid-template-columns:1fr;max-height:64vh;overflow-y:auto;}
-@media(min-width:980px){#shop{grid-template-columns:292px minmax(0,1fr) 316px;}}
-#shop .col{padding:11px 13px;overflow-y:auto;min-height:0;}
+/* Floats over the arena instead of docking to the bottom and shrinking it.
+   The canvas keeps one size for the whole run, and the test dummy at H*.3
+   stays visible and shootable while you rebuild. */
+#shop{position:fixed;left:50%;bottom:16px;z-index:38;
+  width:min(1180px,calc(100vw - 32px));max-height:54vh;
+  background:var(--panel);border:1px solid var(--rule);
+  box-shadow:0 20px 64px rgba(0,0,0,.7),0 1px 0 rgba(236,230,210,.06) inset;
+  display:grid;grid-template-columns:1fr;overflow-y:auto;
+  transform:translateX(-50%);animation:shopIn .24s cubic-bezier(.2,.85,.3,1) both;}
+/* stacked on narrow screens the whole panel scrolls; in three columns each
+   column scrolls on its own, so the schematic never slides out from under you */
+@media(min-width:980px){#shop{grid-template-columns:292px minmax(0,1fr) 316px;overflow:hidden;}}
+@keyframes shopIn{from{opacity:0;transform:translateX(-50%) translateY(22px);}
+  to{opacity:1;transform:translateX(-50%) translateY(0);}}
+@media(prefers-reduced-motion:reduce){#shop{animation:none;}}
+#shop .col{padding:13px 15px;overflow-y:auto;min-height:0;}
 #shop .col+.col{border-top:1px solid var(--rule);}
 @media(min-width:980px){#shop .col+.col{border-top:0;border-left:1px solid var(--rule);}}
-.hdr{font-size:9.5px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);margin:0 0 8px;
+.hdr{font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:rgba(236,230,210,.62);
+  margin:0 0 11px;padding-bottom:7px;border-bottom:1px solid var(--rule);
   display:flex;justify-content:space-between;gap:8px;align-items:baseline;}
+.hdr>span:last-child{color:var(--muted);letter-spacing:.14em;}
 .hdr button{background:none;border:1px solid var(--rule);color:var(--muted);font-size:9px;
   letter-spacing:.12em;padding:2px 7px;cursor:pointer;text-transform:uppercase;}
 .hdr button:hover{color:var(--ink);border-color:var(--ink);}
 .hdr button.on{color:var(--heat);border-color:var(--heat);}
-.chip{border:1px solid var(--rule);padding:6px 8px;margin-bottom:5px;cursor:pointer;display:flex;gap:8px;
-  align-items:flex-start;background:var(--panel2);}
-.chip:hover{border-color:var(--heat);}
+.chip{border:1px solid var(--rule);padding:8px 10px;margin-bottom:6px;cursor:pointer;display:flex;gap:9px;
+  align-items:flex-start;background:var(--panel2);
+  transition:border-color .12s ease,background .12s ease,transform .12s ease;}
+.chip:hover{border-color:var(--heat);transform:translateX(2px);}
 .chip.on{border-color:var(--heat);background:#241a10;}
 .chip.dim{opacity:.3;cursor:default;} .chip.dim:hover{border-color:var(--rule);}
 .chip .d{width:8px;height:8px;flex:0 0 8px;margin-top:4px;}
-.chip b{display:block;font-size:11.5px;font-weight:600;line-height:1.25;}
-.chip s{display:block;font-size:10px;color:var(--muted);line-height:1.35;text-decoration:none;margin-top:1px;}
+.chip b{display:block;font-size:11.5px;font-weight:600;line-height:1.3;letter-spacing:.01em;}
+.chip s{display:block;font-size:10px;color:var(--muted);line-height:1.4;text-decoration:none;margin-top:2px;}
 .chip i{font-style:normal;font-size:8.5px;color:var(--heat);letter-spacing:.1em;display:block;margin-top:2px;}
 .chip em{font-style:normal;font-size:9.5px;color:var(--muted);display:block;margin-top:3px;line-height:1.4;
   border-top:1px solid var(--rule);padding-top:3px;}
 .d-heat{background:var(--heat);} .d-kin{background:var(--kin);} .d-scrap{background:var(--scrap);}
 .d-chg{background:var(--chg);} .d-none{background:var(--muted);}
 #sch{width:100%;height:auto;display:block;max-height:252px;}
-.shopfoot{display:flex;gap:9px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:9px;
-  position:sticky;bottom:0;background:var(--panel);padding-top:8px;}
+.shopfoot{display:flex;gap:9px;align-items:center;justify-content:space-between;flex-wrap:wrap;margin-top:12px;
+  position:sticky;bottom:0;background:var(--panel);padding-top:11px;
+  border-top:1px solid var(--rule);}
 .slotrow{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:8px;}
 .slotrow button{flex:1;min-width:54px;background:none;border:1px solid var(--rule);color:var(--muted);
   font-size:9px;letter-spacing:.1em;padding:4px 2px;cursor:pointer;text-transform:uppercase;}
@@ -120,6 +145,9 @@ button{font-family:var(--mono);}
 .opt label{font-size:11.5px;color:var(--muted);}
 .opt input[type=range]{width:100%;accent-color:var(--heat);}
 .opt .ov{font-size:11px;color:var(--ink);text-align:right;}
+/* a toggle that needs a sentence beside it — the .ov column is 46px */
+.optwith{display:flex;align-items:center;gap:12px;flex-wrap:wrap;min-width:0;}
+.optwith i{font-style:normal;font-size:10px;color:var(--muted);letter-spacing:.06em;}
 .toggle{background:none;border:1px solid var(--rule);color:var(--ink);font-size:10.5px;
   letter-spacing:.1em;padding:5px 12px;cursor:pointer;text-transform:uppercase;justify-self:start;}
 .toggle.on{border-color:var(--heat);color:var(--heat);}
@@ -135,7 +163,13 @@ button{font-family:var(--mono);}
 @media(min-width:760px){.cards{grid-template-columns:repeat(3,1fr);}}
 .ucard{border:1px solid var(--rule);background:var(--panel2);padding:0;cursor:pointer;text-align:left;
   color:var(--ink);display:flex;flex-direction:column;min-height:180px;position:relative;overflow:hidden;}
-.ucard:hover{border-color:var(--heat);transform:translateY(-2px);}
+.ucard{transition:border-color .14s ease,transform .14s cubic-bezier(.2,.85,.3,1),box-shadow .14s ease;}
+.ucard:hover{border-color:var(--heat);transform:translateY(-3px);
+  box-shadow:0 10px 26px rgba(0,0,0,.5);}
+/* deal the three offers in, left to right */
+.cards .ucard{animation:cardPop .24s cubic-bezier(.2,.85,.3,1) both;}
+.cards .ucard:nth-child(2){animation-delay:.055s;}
+.cards .ucard:nth-child(3){animation-delay:.11s;}
 .ucard:focus-visible{outline:2px solid var(--ink);outline-offset:2px;}
 .ucard .stripe2{height:4px;}
 .ucard .inner{padding:14px 15px 15px;display:flex;flex-direction:column;gap:7px;height:100%;}
@@ -212,6 +246,9 @@ button{font-family:var(--mono);}
       <div class="opt"><label for="optSfx">Effects</label><input type="range" id="optSfx" min="0" max="100"><span class="ov" id="ovSfx"></span></div>
       <div class="opt"><label for="optShake">Screen shake</label><input type="range" id="optShake" min="0" max="150"><span class="ov" id="ovShake"></span></div>
       <div class="opt"><label for="optDmg">Damage numbers</label><button class="toggle" id="optDmg">On</button><span class="ov"></span></div>
+      <div class="opt"><label for="optSkate">Skate recoil</label>
+        <span class="optwith"><button class="toggle" id="optSkate">Stock</button><i id="ovSkate"></i></span>
+        <span class="ov"></span></div>
       <div class="opt"><label for="optFull">Fullscreen</label><button class="toggle" id="optFull">Off</button><span class="ov"></span></div>
       <p class="note" style="margin-top:16px">A gamepad works if one is plugged in: left stick moves, right stick aims, right trigger fires, A/cross is the leg action, and the shoulder buttons are your two utilities.</p>
       <div class="rowbtn" style="margin-top:18px"><button class="btn ghost" id="wipeBtn">Erase all progress</button></div>
@@ -720,7 +757,7 @@ const META = {
     drones:0, vultures:0, boss_kiln:0, boss_ricochet:0, boss_foreman:0, boss_inheritor:0,
     win_scrapper:0, win_contender:0, win_champion:0, bestTime:0,
     unlocked:BASE_UNLOCKED.slice(), locker:null, seenIntro:0,
-    opts:{ master:.75, music:.62, sfx:.85, shake:1, dmgnum:1 } }; },
+    opts:{ master:.75, music:.62, sfx:.85, shake:1, dmgnum:1, skate:0 } }; },
   load(){
     this.d = this.DEFAULTS();
     try {
@@ -828,6 +865,12 @@ function recalc(pl){
     pull, droneCap, mismatch, braced, torque: (mismatch && !braced) ? 1 : 0,
     act: leg.act, actCd: leg.actCd,
   };
+  if (leg.id === 'skates'){
+    const m = skateModel();
+    /* .56 keeps 57% of your speed after a second; 1.5 keeps 22%. */
+    if (m === 'damped') pl.S.fric = 1.5;
+    if (m === 'flat')   pl.S.recoilScale = (1.15 / mass) * recoilMul;
+  }
   const R = pl.R || {};
   pl.S.maxHp += R.hp || 0;
   pl.S.maxHeat += R.heatCap || 0;
@@ -973,9 +1016,34 @@ function aimPoint(pl){
 /* ============================================================
    COMBAT
    ============================================================ */
+/* ---------------------------------------------------------------
+   PLAYTEST — three candidate answers to "skates fling you too far".
+   Cycle them live in Options > Skate recoil. Recoil stays a force in
+   all three; they disagree about how long it carries you and whether
+   a 410-kick Slug should scale the same way a 46-kick Rifle does.
+   Pick one and the other two get deleted.
+   --------------------------------------------------------------- */
+const SKATE_MODELS = [
+  { id:'stock',    name:'Stock',      note:'1.8 kick into almost no friction' },
+  { id:'damped',   name:'Damped',     note:'same kick, you coast to a stop' },
+  { id:'softened', name:'Soft heavy', note:'big guns kick less, light guns unchanged' },
+  { id:'flat',     name:'Flat nerf',  note:'less kick from everything' },
+];
+function skateModel(){
+  return SKATE_MODELS[(META.d.opts.skate|0) % SKATE_MODELS.length].id;
+}
 function applyRecoil(pl, force){
-  pl.vx -= Math.cos(pl.aim) * force * pl.S.recoilScale;
-  pl.vy -= Math.sin(pl.aim) * force * pl.S.recoilScale;
+  let f = force;
+  /* 'softened' bends only the top of the curve: a Rifle at 46 is untouched,
+     a Slug at 410 lands at 253. Gate on the leg, not on recoilScale — recalc
+     has already divided that by chassis mass, so it reads ~0.3 on a heavy
+     build and a threshold here would silently never fire. */
+  if (pl.S.leg && pl.S.leg.id === 'skates' && skateModel() === 'softened'){
+    const KNEE = 140, a = Math.abs(f);
+    if (a > KNEE) f = Math.sign(f) * (KNEE + (a - KNEE) * .42);
+  }
+  pl.vx -= Math.cos(pl.aim) * f * pl.S.recoilScale;
+  pl.vy -= Math.sin(pl.aim) * f * pl.S.recoilScale;
   if (pl.S.recoilScale > .9 && force > 150) discover('rec','Recoil is moving you — that is the engine');
 }
 function spendCharge(pl, n){ if (pl.charge < n) return false; pl.charge -= n; return true; }
@@ -2594,25 +2662,47 @@ function hud(){
   const where = G.endless ? 'OVERTIME'
     : isFinal ? 'THE HOUSE — FINAL'
     : 'ACT ' + actOf(G.wave) + '/' + 3 + ' · ' + (ACT_NAMES[actOf(G.wave)-1]||'').toUpperCase();
-  txt(where, 24, 70, 10, isFinal ? COL.scrap : COL.muted);
-  txt(G.mode==='shop' ? 'WORKSHOP' : A.name.toUpperCase()+'  ·  '+left+' LEFT', 24, 86, 11, COL.muted);
+  txt(where, 24, 70, 10, isFinal ? COL.scrap : 'rgba(236,230,210,.52)');
+  txt(G.mode==='shop' ? 'WORKSHOP' : A.name.toUpperCase()+'  ·  '+left+' LEFT', 24, 86, 11, 'rgba(236,230,210,.6)');
   if (G.handicap) txt('BET: '+HANDICAPS.find(h=>h.id===G.handicap).name.toUpperCase(), 24, 102, 10, COL.scrap);
   txt('SALVAGE '+G.salvage, W-24, 44, 12, COL.scrap, 'right');
-  txt('KILLS '+G.kills, W-24, 62, 12, COL.muted, 'right');
+  txt('KILLS '+G.kills, W-24, 62, 12, 'rgba(236,230,210,.6)', 'right');
   txt(G.D.name.toUpperCase(), W-24, 80, 10, COL.muted, 'right');
 
-  const bx=24, by=H-76;
-  txt('INTEGRITY', bx, by-6, 9.5, COL.muted);
-  bar(bx, by, 210, 11, pl.hp/pl.maxHp, pl.hp/pl.maxHp<.3?COL.bad:COL.kin);
-  txt(Math.ceil(pl.hp)+'/'+Math.round(pl.maxHp), bx+218, by+10, 11, COL.muted);
-  txt('CHARGE', bx, by+28, 9.5, pl.jammed>0?COL.bad:COL.muted);
-  bar(bx, by+34, 170, 9, pl.charge/pl.maxCharge, pl.jammed>0?'#7a6f6a':COL.chg);
-  if (pl.jammed>0) txt('JAMMED', bx+178, by+42, 9.5, COL.bad);
-  txt('FUEL', bx, by+58, 9.5, COL.muted);
-  bar(bx, by+64, 130, 8, pl.fuel/pl.maxFuel, COL.scrap);
+  /* One column, one width, one rhythm. Integrity is the number you die by,
+     so it is the tallest bar and the only one with a full-size readout. */
+  const bx=24, BW=216, by=H-86, LAB='rgba(236,230,210,.6)';
+  const hpf = pl.hp/pl.maxHp, lowHp = hpf < .3;
+
+  if (G.mode === 'shop'){
+    /* The workshop card covers the bottom strip, so while you are test-firing
+       the three things you actually watch move up into the clear band. */
+    dispTxt('WAVE CLEARED — REBUILD', W/2, 96, 26, COL.heat, 'center');
+    txt('shoot the dummy · swapping is free · ENTER to deploy', W/2, 116, 11.5, COL.muted, 'center');
+    const sy = 146, SW = 186, hs = hotness(pl);
+    txt('INTEGRITY', bx, sy-8, 10, lowHp?COL.bad:LAB);
+    bar(bx, sy, SW, 13, hpf, lowHp?COL.bad:COL.kin);
+    txt(Math.ceil(pl.hp)+'/'+Math.round(pl.maxHp), bx+SW+11, sy+11, 12, lowHp?COL.bad:COL.ink);
+    txt('CHARGE', bx, sy+30, 10, LAB);
+    bar(bx, sy+37, SW, 10, pl.charge/pl.maxCharge, COL.chg);
+    txt('HEAT', bx, sy+60, 10, LAB);
+    bar(bx, sy+67, SW, 12, hs, hs>.85?'#ffd27a':COL.heat);
+    if (pl.S.heatDamage) txt('DAMAGE ×'+heatMult(pl).toFixed(2), bx+SW+11, sy+78, 11, COL.heat);
+    return;
+  }
+
+  txt('INTEGRITY', bx, by-8, 10, lowHp?COL.bad:LAB);
+  bar(bx, by, BW, 15, hpf, lowHp?COL.bad:COL.kin);
+  txt(Math.ceil(pl.hp)+'/'+Math.round(pl.maxHp), bx+BW+11, by+12, 13, lowHp?COL.bad:COL.ink);
+  txt('CHARGE', bx, by+32, 10, pl.jammed>0?COL.bad:LAB);
+  bar(bx, by+39, BW, 10, pl.charge/pl.maxCharge, pl.jammed>0?'#7a6f6a':COL.chg);
+  if (pl.jammed>0) txt('JAMMED', bx+BW+11, by+48, 10, COL.bad);
+  else txt(Math.round(pl.charge), bx+BW+11, by+48, 11, LAB);
+  txt('FUEL', bx, by+64, 10, LAB);
+  bar(bx, by+71, BW, 10, pl.fuel/pl.maxFuel, COL.scrap);
 
   const hw=300, hx=W/2-hw/2, hy=H-46, h=hotness(pl);
-  txt('HEAT', hx, hy-7, 9.5, COL.muted);
+  txt('HEAT', hx, hy-8, 10, 'rgba(236,230,210,.6)');
   bar(hx, hy, hw, 14, h, h>.85?'#ffd27a':COL.heat);
   ctx.fillStyle='rgba(236,230,210,.5)'; ctx.fillRect(hx+hw-2, hy-4, 2, 22);
   if (pl.S.heatDamage) txt('DAMAGE ×'+heatMult(pl).toFixed(2), hx+hw+12, hy+12, 11, COL.heat);
@@ -2643,10 +2733,6 @@ function hud(){
     txt(u.name.toUpperCase(), ux-w2+8, H-46, 9.5, rdy?COL.ink:COL.muted);
     txt(u.active ? (i===0?'Q':'E') + (u.chg?'  '+u.chg+' chg':'  free') : 'PASSIVE', ux-w2+8, H-34, 9, COL.muted);
     ux -= w2+8;
-  }
-  if (G.mode==='shop'){
-    dispTxt('WAVE CLEARED — REBUILD', W/2, 96, 26, COL.heat, 'center');
-    txt('shoot the dummy · swapping is free · ENTER to deploy', W/2, 116, 11.5, COL.muted, 'center');
   }
 }
 </script>
@@ -2961,6 +3047,12 @@ function buildOptions(){
   set('optShake',  Math.round(o.shake*100),  Math.round(o.shake*100)+'%');
   const dm = document.getElementById('optDmg');
   dm.textContent = o.dmgnum ? 'On' : 'Off'; dm.classList.toggle('on', !!o.dmgnum);
+  const sk = document.getElementById('optSkate');
+  if (sk){
+    const sm = SKATE_MODELS[(o.skate|0) % SKATE_MODELS.length];
+    sk.textContent = sm.name; sk.classList.toggle('on', (o.skate|0) !== 0);
+    const ov = document.getElementById('ovSkate'); if (ov) ov.textContent = sm.note;
+  }
 }
 function bindOptions(){
   const o = META.d.opts;
@@ -2977,6 +3069,11 @@ function bindOptions(){
   wire('optShake','shake',100);
   document.getElementById('optDmg').addEventListener('click', () => {
     o.dmgnum = o.dmgnum ? 0 : 1; META.save(); buildOptions();
+  });
+  document.getElementById('optSkate').addEventListener('click', () => {
+    o.skate = ((o.skate|0) + 1) % SKATE_MODELS.length; META.save(); buildOptions();
+    if (G) for (const p of G.players) recalc(p);   /* felt immediately, mid-run */
+    toast('SKATES: ' + SKATE_MODELS[o.skate|0].name.toUpperCase());
   });
   document.getElementById('optFull').addEventListener('click', e => {
     const el = document.documentElement;
@@ -3110,12 +3207,10 @@ function frame(now){
   else { ctx.fillStyle='#16150e'; ctx.fillRect(0,0,W,H); }
 }
 function fit(){
-  const shop = document.getElementById('shop');
-  const shopH = shop.classList.contains('hide') ? 0 : shop.getBoundingClientRect().height;
-  const avail = Math.max(220, innerHeight - shopH);
-  const s = Math.min(innerWidth/W, avail/H);
+  /* The workshop floats now, so nothing here reads its height — the arena is
+     one constant size from the title screen to the last wave. */
+  const s = Math.min(innerWidth/W, innerHeight/H);
   cv.style.width = (W*s)+'px'; cv.style.height = (H*s)+'px';
-  document.getElementById('stage').style.alignItems = shopH ? 'flex-start' : 'center';
 }
 addEventListener('resize', fit);
 buildDiffPicks(); bindOptions(); buildOptions(); fit();
