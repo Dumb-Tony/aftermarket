@@ -45,8 +45,17 @@ const { chromium } = require('playwright');
           keys.KeyS=Math.sin(ax)>.3; keys.KeyW=Math.sin(ax)<-.3;
           keys.Space = (q.S.act==='brace'||q.S.act==='anchor') && best && bd > 200*200;
           if (best && bd < 90*90 && q.legT<=0) legAction(q);
-          if (hotness(q)>.75 || q.charge>=90){ useUtil(q,0); useUtil(q,1); }
-          if (ticks%90===0){ useUtil(q,0); useUtil(q,1); }
+          /* Heat is not a hazard on a heatDamage core - damage is 1+hot*1.45 and the
+             only cost is crossing the lid (0.85s stagger, 10hp, heat back to 0). The
+             flat .75 dump plus the timed fire below emptied the furnace every ~2.6s,
+             pinning it near 1.0x all run. Ride the curve and vent just under the lid,
+             where Slag Vent's refund is biggest anyway. Other builds: unchanged. */
+          if (q.S.heatDamage){
+            if (hotness(q) > .93){ useUtil(q,0); useUtil(q,1); }
+          } else {
+            if (hotness(q)>.75 || q.charge>=90){ useUtil(q,0); useUtil(q,1); }
+            if (ticks%90===0){ useUtil(q,0); useUtil(q,1); }
+          }
         }
         update(); ticks++;
       }
